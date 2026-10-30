@@ -38,7 +38,8 @@ pnpm build
 | GEMINI_MODEL | 기본 `gemini-3.5-flash-lite` |
 | APP_URL | 공개 배포 주소. 후속 메일의 상담 재개·수신 거부 링크 |
 | CRON_SECRET | 무작위 32자 이상. 서버 스케줄러 인증 |
-| RESEND_API_KEY / EMAIL_FROM | 실제 메일 발송 시 필요. 인증된 발신주소 사용 |
+| GMAIL_USER / GMAIL_APP_PASSWORD | 실제 메일 발송(권장). Google 계정 2단계 인증 후 만든 앱 비밀번호. 누구에게나 발송 가능 |
+| RESEND_API_KEY / EMAIL_FROM | Gmail 대신 Resend 사용 시. 인증된 도메인 발신주소가 없으면 계정 주인 이메일로만 발송됨 |
 
 Supabase 새 프로젝트에서는 `supabase/schema.sql`을 한 번 실행합니다. 이미 초기 스키마가 있으면 추가 기능에 맞춰 `migration-company.sql`, `migration-nurture.sql`, `migration-brief.sql`, `migration-profile.sql`을 적용합니다. 이미 적용한 정책·발행 테이블 추가를 중복 실행하지 마세요. Auth → Sign In / Providers에서 Anonymous Sign-Ins를 켜야 고객에게 로그인 폼 없이 방문자 세션을 발급할 수 있습니다.
 
@@ -70,3 +71,13 @@ GitHub Collaborators에 팀원을 추가하고 각자 브랜치 → PR → main 
 공식 근거: [ACRYL 문의](https://www.acryl.ai/contact), [JONATHAN](https://www.acryl.ai/products/jonathan), [GPUBASE](https://www.acryl.ai/products/gpubase), [AGENTBASE](https://www.acryl.ai/products/agentbase), [MODELBASE](https://www.acryl.ai/products/modelbase), [Gemini 구조화 출력](https://ai.google.dev/gemini-api/docs/structured-output).
 
 시연 서버에는 Gemini·Supabase·스케줄러 보안 키를 등록했습니다. 실제 담당자 시연 계정은 비공개 로컬 안내 파일로 제공하며 저장소에 포함하지 않습니다. 후속 이메일 발송은 Resend 키와 인증된 발신주소를 추가해야 합니다.
+
+## CRM 학습 리드 점수와 유입고객 DB
+
+- `model/train.py`: 아크릴 CRM 데이터① 잠재고객 중 직급이 확인된 1,817명으로 로지스틱 회귀를 학습합니다. 레이블은 리드등급 A·B 여부이며 데이터 제공사의 모의 생성값입니다. 홀드아웃 AUC 0.922, 5겹 교차검증 0.917±0.009, 직급만 쓴 기준 모델 0.775.
+- `lib/lead-model.mjs`: 같은 가중치로 브라우저·서버에서 점수를 계산합니다. Gemini는 대화에서 직책·요청 유형·관심 제품만 추출하고, 점수는 이 모델이 결정적으로 계산합니다. 모르는 항목은 CRM 분포로 평균 내어 점수와 10~90% 범위를 함께 표시합니다.
+- 유입고객 DB: `supabase/migration-crm.sql` 실행 후, 로컬에서 엑셀로 시드를 만들어 Supabase SQL 편집기에서 실행합니다. 고객 단위 데이터이므로 저장소에 커밋하지 않습니다.
+  ```sh
+  python3 model/export_prospects.py 데이터셋①.xlsx /tmp/prospects.json
+  node model/build_seed.mjs /tmp/prospects.json supabase/seed-crm.sql
+  ```

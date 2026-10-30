@@ -66,3 +66,17 @@
 
 @media(max-width:800px){.ai-panel{position:static;max-height:none}}
 @media(prefers-reduced-motion:reduce){.ai-dot.live,.ai-steps li.run span,.thinking span,.type-caret,.ai-slots div.new{animation:none}.ai-bar i,.ai-progress i{transition:none}}
+
+/* Lead score from the CRM-trained model */
+.ai-score .score-row{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.score-num{font-size:40px;line-height:1;font-weight:700;color:#fff;font-variant-numeric:tabular-nums;letter-spacing:-1px}
+.score-num small{font-size:16px;margin-left:2px;color:#b9c3dc}
+.score-tier{font-size:11px;font-weight:700;border-radius:999px;padding:4px 10px;background:#2a3a63;color:#dfe6f5}
+.score-tier.t3{background:#ccfda4;color:#14234a}.score-tier.t2{background:#79dfcc;color:#14234a}
+.score-range{position:relative;height:8px;background:#1f2f57;border-radius:4px;margin:12px 0 4px}
+.score-range i{position:absolute;top:0;bottom:0;background:linear-gradient(90deg,#2457b1,#63bdc5);border-radius:4px;opacity:.8;transition:left .8s,width .8s}
+.score-range em{position:absolute;top:-4px;width:3px;height:16px;margin-left:-1px;background:#fff;border-radius:2px;transition:left .8s}
+.score-factors{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:6px}
+.score-factors li{font-size:11px;border-radius:6px;padding:3px 8px;background:#1a2950;border:1px solid #2a3a63}
+.score-factors li.up{color:#ccfda4}.score-factors li.down{color:#f2b8b5}
+.score-note{display:block;font-size:10px;color:#8b97b5;margin-top:10px;line-height:1.5}

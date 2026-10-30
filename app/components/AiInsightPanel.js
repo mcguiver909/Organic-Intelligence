@@ -1,11 +1,12 @@
 'use client';
 import {useEffect,useState} from 'react';
 import {intentStages,crmBenchmark,slotLabels,completeness,missingInfo} from '../../lib/insight.mjs';
+import {model,featureLabels} from '../../lib/lead-model.mjs';
 
 const steps=['질문 이해','조건 추출 · 근거 검증','제품 적합도 계산','답변 작성'];
 const pct=v=>Math.round(v*1000)/10+'%';
 
-export default function AiInsightPanel({insight,slots,newKeys,busy}){
+export default function AiInsightPanel({insight,slots,newKeys,busy,lead}){
  const [step,setStep]=useState(0);
  useEffect(()=>{if(!busy){setStep(steps.length);return;}setStep(0);const t=setInterval(()=>setStep(s=>Math.min(s+1,steps.length-1)),650);return()=>clearInterval(t);},[busy]);
  const fit=insight?.productFit||[];
@@ -18,6 +19,14 @@ export default function AiInsightPanel({insight,slots,newKeys,busy}){
  return <aside className="ai-panel" aria-label="AI 실시간 분석">
   <div className="ai-head"><span className={'ai-dot'+(busy?' live':'')} aria-hidden="true"/><div><small>LIVE AI ANALYSIS</small><h2>AI 실시간 분석</h2></div>{insight&&<span className="ai-engine">{insight.engine==='gemini'?'Gemini':'규칙 기반'}</span>}</div>
 
+  {lead&&<section className="ai-block ai-score" aria-label="리드 점수"><h3>CRM 학습 모델 · 영업 우선순위</h3>
+   <div className="score-row"><b className="score-num">{lead.score}<small>%</small></b><span className={'score-tier t'+(lead.score>=60?3:lead.score>=30?2:1)}>{lead.tier}</span></div>
+   <div className="score-range" aria-label={`예상 범위 ${lead.low}~${lead.high}%`}><i style={{left:lead.low+'%',width:Math.max(2,lead.high-lead.low)+'%'}}/><em style={{left:lead.score+'%'}}/></div>
+   <p className="ai-meta">{lead.unknown.length?<>예상 범위 {lead.low}~{lead.high}% · 아직 확인하지 못한 정보({lead.unknown.map(k=>featureLabels[k]).join('·')})를 알면 범위가 좁혀집니다.</>:<>필요한 정보를 모두 확인해 범위 없이 계산했습니다.</>}</p>
+   {lead.factors.length>0&&<ul className="score-factors">{lead.factors.slice(0,4).map(f=><li key={f.feature} className={f.weight>0?'up':'down'}>{f.weight>0?'▲':'▼'} {featureLabels[f.feature]} · {f.value}</li>)}</ul>}
+   {lead.similar?.n>=5&&<p className="ai-meta">비슷한 과거 리드 {lead.similar.n}명 중 {lead.similar.positive}명이 우선 영업 대상이었습니다.</p>}
+   <small className="score-note">아크릴 CRM {model.trainRows.toLocaleString()}명으로 학습 · 검증 AUC {model.metrics.holdoutAUC} · Gemini는 정보 추출만 하고 점수는 이 모델이 계산합니다.</small>
+  </section>}
   <section className="ai-block"><h3>AI 처리 과정</h3><ol className="ai-steps">{steps.map((s,i)=><li key={s} className={busy?(i<step?'done':i===step?'run':''):insight?'done':''}><span aria-hidden="true"/>{s}</li>)}</ol>
    {insight&&!busy&&<p className="ai-meta">응답 {(insight.latencyMs/1000).toFixed(1)}초{ex&&ex.proposed>0?` · 조건 ${ex.accepted}/${ex.proposed}개 원문 대조 통과`:''}{ec&&ec.checked>0?` · 적합도 근거 ${ec.verified}/${ec.checked}개 확인`:''}</p>}
    {!insight&&!busy&&<p className="ai-meta">첫 메시지를 보내면 AI가 대화를 분석해 이곳에 보여 줍니다.</p>}

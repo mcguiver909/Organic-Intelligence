@@ -4,3 +4,8 @@ node_modules/
 !.env.example
 .vercel/
 *.log
+
+# Customer-level seed generated from the hackathon dataset
+supabase/seed-*.sql
+model/*.json
+*.xlsx

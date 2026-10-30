@@ -31,6 +31,7 @@ test('Postgres RLS: customer isolation, staff read/update, secret protection and
  await db.query('select confirm_meeting($1,$2,$3)',[id,staff,start]);
  assert.equal((await db.query('select * from meeting_bookings')).rows.length,1);
  await assert.rejects(db.query('select confirm_meeting($1,$2,$3)',[id,staff,start]));
+await db.query("insert into crm_prospects(customer_id,score,score_low,score_high,tier) values('TEST-ONLY',80,70,90,'우선 연락')");
  const second='00000000-0000-4000-8000-000000000004';
  await db.query(`insert into leads(id,owner_id,name,company,email,slots,summary,crm,consent_at,consent_version,receipt_hash,meeting,preferred_times) select $1,owner_id,name,company,email,slots,summary,crm,consent_at,consent_version,receipt_hash,true,preferred_times from leads where id=$2`,[second,id]);
  await assert.rejects(db.query('select confirm_meeting($1,$2,$3)',[second,staff,start]));
@@ -38,5 +39,9 @@ test('Postgres RLS: customer isolation, staff read/update, secret protection and
  await db.exec(`set role authenticated;set request.jwt.claim.sub='${visitor}';`);
  assert.equal((await db.query('select * from meeting_bookings')).rows.length,0);
  await assert.rejects(db.query('select confirm_meeting($1,$2,$3)',[second,visitor,start]));
+ assert.equal((await db.query('select * from crm_prospects')).rows.length,0);
+ await assert.rejects(db.query("insert into crm_prospects(customer_id,score,score_low,score_high,tier) values('X',1,1,1,'x')"));
+ await db.exec(`set request.jwt.claim.sub='${staff}';`);
+ assert.equal((await db.query('select customer_id from crm_prospects')).rows.length,1);
  await db.close();
 });
