@@ -1,55 +1,22 @@
 'use client';
-import {useEffect,useState} from 'react';
-import {intentStages,crmBenchmark,slotLabels,completeness,missingInfo} from '../../lib/insight.mjs';
-import {model,featureLabels} from '../../lib/lead-model.mjs';
+import {slotLabels,missingInfo} from '../../lib/insight.mjs';
+import {productLineup} from '../../lib/products.mjs';
 
-const steps=['질문 이해','조건 추출 · 근거 검증','제품 적합도 계산','답변 작성'];
-const pct=v=>Math.round(v*1000)/10+'%';
-
-export default function AiInsightPanel({insight,slots,newKeys,busy,lead}){
- const [step,setStep]=useState(0);
- useEffect(()=>{if(!busy){setStep(steps.length);return;}setStep(0);const t=setInterval(()=>setStep(s=>Math.min(s+1,steps.length-1)),650);return()=>clearInterval(t);},[busy]);
+export default function AiInsightPanel({insight,slots,busy}){
  const fit=insight?.productFit||[];
- const stageIndex=insight?intentStages.indexOf(insight.intent.stage):-1;
- const bench=crmBenchmark[insight?.requestCategory||'없음'];
  const filled=Object.entries(slots).filter(([k,v])=>v&&slotLabels[k]&&v!=='아직 모르겠어요');
- const done=completeness(slots);
  const missing=insight?.nextQuestions?.length?insight.nextQuestions:missingInfo(slots).slice(0,3);
- const ec=insight?.evidenceCheck,ex=insight?.extraction;
- return <aside className="ai-panel" aria-label="AI 실시간 분석">
-  <div className="ai-head"><span className={'ai-dot'+(busy?' live':'')} aria-hidden="true"/><div><small>LIVE AI ANALYSIS</small><h2>AI 실시간 분석</h2></div>{insight&&<span className="ai-engine">{insight.engine==='gemini'?'Gemini':'규칙 기반'}</span>}</div>
+ return <aside className="ai-panel" aria-label="상담 메모" aria-busy={busy}>
+  <header className="insight-heading"><div><span className="insight-eyebrow">CONSULTATION NOTES</span><h2>함께 정리한 내용</h2></div><span className="insight-status" role="status">{busy?'정리 중':'상담 메모'}</span></header>
+  <p className="insight-intro">대화에서 확인한 내용을 모아두었어요.</p>
 
-  {lead&&<section className="ai-block ai-score" aria-label="리드 점수"><h3>CRM 학습 모델 · 영업 우선순위</h3>
-   <div className="score-row"><b className="score-num">{lead.score}<small>%</small></b><span className={'score-tier t'+(lead.score>=60?3:lead.score>=30?2:1)}>{lead.tier}</span></div>
-   <div className="score-range" aria-label={`예상 범위 ${lead.low}~${lead.high}%`}><i style={{left:lead.low+'%',width:Math.max(2,lead.high-lead.low)+'%'}}/><em style={{left:lead.score+'%'}}/></div>
-   <p className="ai-meta">{lead.unknown.length?<>예상 범위 {lead.low}~{lead.high}% · 아직 확인하지 못한 정보({lead.unknown.map(k=>featureLabels[k]).join('·')})를 알면 범위가 좁혀집니다.</>:<>필요한 정보를 모두 확인해 범위 없이 계산했습니다.</>}</p>
-   {lead.factors.length>0&&<ul className="score-factors">{lead.factors.slice(0,4).map(f=><li key={f.feature} className={f.weight>0?'up':'down'}>{f.weight>0?'▲':'▼'} {featureLabels[f.feature]} · {f.value}</li>)}</ul>}
-   {lead.similar?.n>=5&&<p className="ai-meta">비슷한 과거 리드 {lead.similar.n}명 중 {lead.similar.positive}명이 우선 영업 대상이었습니다.</p>}
-   <small className="score-note">아크릴 CRM {model.trainRows.toLocaleString()}명으로 학습 · 검증 AUC {model.metrics.holdoutAUC} · Gemini는 정보 추출만 하고 점수는 이 모델이 계산합니다.</small>
-  </section>}
-  <section className="ai-block"><h3>AI 처리 과정</h3><ol className="ai-steps">{steps.map((s,i)=><li key={s} className={busy?(i<step?'done':i===step?'run':''):insight?'done':''}><span aria-hidden="true"/>{s}</li>)}</ol>
-   {insight&&!busy&&<p className="ai-meta">응답 {(insight.latencyMs/1000).toFixed(1)}초{ex&&ex.proposed>0?` · 조건 ${ex.accepted}/${ex.proposed}개 원문 대조 통과`:''}{ec&&ec.checked>0?` · 적합도 근거 ${ec.verified}/${ec.checked}개 확인`:''}</p>}
-   {!insight&&!busy&&<p className="ai-meta">첫 메시지를 보내면 AI가 대화를 분석해 이곳에 보여 줍니다.</p>}
+  <section className="insight-section"><h3>검토할 솔루션</h3>
+   {fit.length?<ul className="insight-solutions">{fit.slice(0,4).map(p=>{const product=productLineup.find(item=>item.id===p.product);return <li key={p.product}><h4>{p.product}</h4>{product?.summary&&<p className="insight-description">{product.summary}</p>}{p.evidence?<blockquote><span>말씀하신 내용</span><p>“{p.evidence}”</p></blockquote>:<p className="insight-muted">업무와 도입 조건을 조금 더 확인할게요.</p>}</li>;})}</ul>:<p className="insight-empty">해결하고 싶은 업무를 알려주시면,<br/>함께 검토할 방향을 정리해 드릴게요.</p>}
   </section>
 
-  <section className="ai-block"><h3>제품 적합도</h3>
-   {fit.length?<ul className="ai-fit">{fit.slice(0,4).map(p=><li key={p.product}><div className="ai-fit-row"><b>{p.product}</b><span>{p.score}</span></div><div className="ai-bar"><i style={{width:p.score+'%'}}/></div>{p.evidence&&<q>{p.evidence}</q>}</li>)}</ul>:<p className="ai-empty">아직 근거가 부족합니다. 업무나 문제를 말씀해 주시면 계산합니다.</p>}
-  </section>
+  {missing.length>0&&<section className="insight-section"><h3>아직 확인할 사항</h3><ul className="insight-questions">{missing.map(m=><li key={m}>{m}</li>)}</ul></section>}
 
-  <section className="ai-block"><h3>구매 여정 단계</h3>
-   <ol className="ai-journey">{intentStages.map((s,i)=><li key={s} className={i<=stageIndex?'on':''} aria-current={i===stageIndex?'step':undefined}>{s}</li>)}</ol>
-   {insight?.intent.evidence&&<q className="ai-quote">{insight.intent.evidence}</q>}
-  </section>
-
-  <section className="ai-block"><h3>파악한 조건 <span className="ai-count">{done}%</span></h3>
-   <div className="ai-progress" role="progressbar" aria-valuenow={done} aria-valuemin={0} aria-valuemax={100}><i style={{width:done+'%'}}/></div>
-   {filled.length?<dl className="ai-slots">{filled.map(([k,v])=><div key={k} className={newKeys.includes(k)?'new':''}><dt>{slotLabels[k]}{newKeys.includes(k)&&<em>NEW</em>}</dt><dd>{v}</dd></div>)}</dl>:<p className="ai-empty">대화에서 확인한 조건이 여기에 쌓입니다.</p>}
-   {missing.length>0&&<><h4>AI가 다음에 확인할 정보</h4><ul className="ai-missing">{missing.map(m=><li key={m}>{m}</li>)}</ul></>}
-  </section>
-
-  {insight&&insight.requestCategory!=='없음'&&bench&&<section className="ai-block ai-bench"><h3>아크릴 CRM 기준 영업 신호</h3>
-   <p><b>{insight.requestCategory}</b>로 분류했습니다. 아크릴 CRM에서 같은 요청을 남긴 잠재고객 {bench.n}명 중 <b>{pct(bench.ab)}</b>가 우선 영업 대상(A·B)이었습니다. 요청 기록이 없는 고객은 {pct(crmBenchmark['없음'].ab)}입니다.</p>
-   <small>출처: 아크릴 고객 데이터 v4.2 집계. 리드 등급은 데이터 제공사가 모의 생성한 값입니다.</small>
-  </section>}
+  <details className="insight-confirmed"><summary>확인한 상담 정보</summary>{filled.length?<dl>{filled.map(([k,v])=><div key={k}><dt>{slotLabels[k]}</dt><dd>{v}</dd></div>)}</dl>:<p className="insight-empty">대화하며 확인한 조건이 여기에 정리됩니다.</p>}</details>
+  <p className="insight-footnote">검토 방향은 상담이 진행되며 달라질 수 있습니다.</p>
  </aside>;
 }

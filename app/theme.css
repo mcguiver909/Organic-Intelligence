@@ -29,23 +29,6 @@ input:focus,select:focus,textarea:focus{outline-color:var(--brand)}
 .meeting-banner .primary{background:#fff;color:var(--brand)}
 .company-context{border-right-color:#e3e9f4}
 
-/* AI panel in the brand's deep blue */
-.ai-panel{background:var(--brand-ink)}
-.ai-head{border-bottom-color:#2a3a63}
-.ai-block{border-bottom-color:#22325a}
-.ai-dot.live{background:var(--brand-mint)}
-.ai-bar i{background:var(--brand-gradient)}
-.ai-progress i{background:linear-gradient(90deg,var(--brand-teal),var(--brand-lime))}
-.ai-bar,.ai-progress,.ai-journey li{background:#1f2f57}
-.ai-journey li.on{background:#2f4a86}
-.ai-journey li[aria-current="step"]{background:var(--brand-mint);color:var(--brand-ink)}
-.ai-steps li.run span{border-color:var(--brand-mint);border-right-color:transparent}
-.ai-steps li.done span{background:var(--brand-mint);border-color:var(--brand-mint)}
-.ai-steps li.done span::after{border-color:var(--brand-ink)}
-.ai-slots div{background:#1a2950;border-color:#2a3a63}
-.ai-slots div.new{border-color:var(--brand-mint)}
-.ai-slots dt em{background:var(--brand-lime);color:var(--brand-ink)}
-.ai-engine{border-color:#3a4c7a}
 .thinking span{background:var(--brand)}
 
 /* Product lineup carousel on the first screen */
