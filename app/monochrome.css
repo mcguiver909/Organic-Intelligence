@@ -1,0 +1,28 @@
+/* ACRYL-inspired typography and spacing, with a white/black interface. */
+:root{color-scheme:light;--ink:#111;--muted:#6b6b6b;--line:#e5e5e5;--soft:#f5f5f5}
+body{background:#fff;color:var(--ink)}
+header{border-color:var(--line);height:96px;padding:0 5%;background:#fff}
+.brand{color:#111;font-weight:400;letter-spacing:4px}.brand b{color:#111;font-weight:700}.brand span{color:#777}
+nav{color:#333}nav a:hover{text-decoration:underline;text-underline-offset:5px}
+main{padding-top:50px}.eyebrow{color:#666;letter-spacing:2.4px}
+.hero{padding:26px 0 40px}.hero h1{font-weight:750;letter-spacing:-2.5px}.hero em{color:#111}.hero p,.hero-note{color:#707070}.hero-note{border-color:#ddd}
+.mode,.mode.demo{background:#f7f7f7;border:1px solid #e3e3e3;color:#444;border-radius:6px}
+.panel{border-color:var(--line);box-shadow:none;border-radius:14px}.panel-head{border-color:#eee}.panel-head small{color:#888}.pill{background:#f1f1f1;color:#333}
+button{border-color:#ddd;color:#222;border-radius:8px}button:hover{border-color:#111;background:#f5f5f5}
+input,select,textarea{border-color:#ddd;background:#fff;color:#111;border-radius:6px}input:focus,select:focus,textarea:focus{outline-color:#111}label{color:#444}
+.primary,.composer button,.primary.cta{background:#111;color:#fff;border-color:#111;border-radius:999px}.primary:hover,.primary.cta:hover{background:#333;color:#fff}
+.goal-grid button{background:#fff;border-color:#ddd}.goal-grid button span,.goal-grid button b{color:#777}
+.track-choice>p,.track-choice small,.hint,.muted,.need-choice p{color:#777}.track-choice>a,.consult-brief a,.guide-intro a{color:#222;text-decoration:underline;text-underline-offset:3px}
+.track-choice button.active,.need-choice button.active{background:#111;color:#fff;border-color:#111}.track-choice button.active small{color:#ccc}
+.messages .message{background:#f4f4f4;color:#222}.message small{color:#777}.messages .message.user{background:#111;color:white}.message.user small{color:#ccc}
+.composer{border-color:#ccc}.composer textarea{background:white}
+.recommend{background:#f6f6f6;border-color:#e0e0e0}.recommend small,.recommend a{color:#555}
+.privacy{background:#f7f7f7;color:#777}.success{background:#f3f3f3;border:1px solid #ddd}.notice{background:#111;color:#fff}
+.consult-brief{background:#fafafa;border-color:#e3e3e3}.consult-brief p{color:#555}dl div{background:#f3f3f3}dt{color:#777}dd{color:#222}
+.video-end{background:#efefef}.video-end small{color:#666}.video-end a{color:#222}.video-end .primary{color:#fff}
+.inline-videos article{background:#fafafa;border-color:#ddd}.inline-videos>p,.inline-videos p,.inline-videos small{color:#666}.video-play{background:#171717;color:#fff}.video-play:hover{background:#333;color:#fff}.video-actions a{color:#222;text-decoration:underline}
+.value-card small,.value-card p,.value-card>a:not(.cta){color:#555}.video-art{background:#171717;color:#fff}.video-card p{color:#666}.video-link{color:#222}.secondary{background:#eee;color:#111}
+.meeting-banner{background:#111;color:#fff}.meeting-banner p{color:#ccc}.meeting-banner .primary{background:#fff;color:#111;border-color:#fff}.meeting-fields{background:#f5f5f5}.meeting-fields small{color:#777}
+.platform-stack{border-color:#ddd}.platform-stack div,.platform-stack div:nth-child(2),.platform-stack div:last-child{background:#f6f6f6;border-color:#ddd}.platform-stack span{color:#555}
+.guide-intro p,.stats small,.login p{color:#666}.stats div{border-color:#ddd;box-shadow:none}.table-wrap th{background:#f2f2f2;color:#555}.table-wrap td,.table-wrap th{border-color:#e6e6e6}.table-wrap td small{color:#777}.empty{color:#777}pre{background:#f5f5f5}footer{color:#777}
+@media(max-width:800px){header{height:82px;padding:0 20px}main{padding-top:30px}.hero{padding:22px 0 28px}.hero h1{letter-spacing:-1.8px}.brand{letter-spacing:2px}.panel-head{gap:10px}.panel-head h2{font-size:16px}.pill{white-space:nowrap;flex-shrink:0;font-size:9px;padding:4px 8px}}

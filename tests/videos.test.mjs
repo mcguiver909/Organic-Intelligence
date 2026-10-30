@@ -1,0 +1,2 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {nextVideo} from '../lib/videos.mjs';
+test('consultation ends with verified video suited to GPU discovery stage',()=>{assert.equal(nextVideo({goal:'GPU 운영 효율',scale:''}).id,'uhSaPMwp4V4');assert.equal(nextVideo({goal:'GPU 운영 효율',scale:'20장'}).id,'aQQwitezCUg');assert.equal(nextVideo({goal:'모델 개발·운영'}).kind,'기술 웨비나');assert.equal(nextVideo({goal:'의료 AI'}).id,'RTvbPVrxGRQ');});

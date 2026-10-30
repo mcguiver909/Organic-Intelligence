@@ -1,0 +1,4 @@
+import {videoLibrary} from '../../lib/videos.mjs';
+import ConsultationVideos from '../components/ConsultationVideos';
+export const metadata={title:'공식 제품 소개·시연 영상 | ACRYL ONE'};
+export default function Videos(){return <><header><a className="brand" href="/">ACRYL <b>ONE</b><span>OFFICIAL VIDEO LIBRARY</span></a><nav><a href="/">도입 상담</a><a href="/guide">제품 관계 알아보기</a></nav></header><main><div className="eyebrow">공식 채널에서 확인한 자료 · 2026-10-30</div><section className="hero"><div><h1>설명만으로 어렵다면,<br/><em>소개와 시연으로 확인하세요.</em></h1><p>제품 소개·시연·기술 발표·과거 개발 사례를 구분했습니다.<br/>현재 제품의 기능·가격·적용 범위는 공식 제품 페이지와 담당자에게 확인하세요.</p></div></section><div className="panel"><ConsultationVideos items={videoLibrary}/></div></main><footer>제목·길이·채널 설명 기준의 검증된 영상 목록입니다. 전체 시청·자막 분석이나 과거 버전의 현행 지원을 의미하지 않습니다.</footer></>;}
