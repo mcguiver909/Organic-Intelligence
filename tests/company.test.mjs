@@ -23,3 +23,16 @@ test('unsupported quotations are dropped; rejected hypotheses never become confi
  a.hypotheses[0].response='no';assert.deepEqual(confirmedProblems(a),[]);
  a.hypotheses[0].response='different';a.hypotheses[0].correction='연구 데이터 정리가 필요해요';assert.deepEqual(confirmedProblems(a),['연구 데이터 정리가 필요해요']);
 });
+
+import {fallbackSlots,blankSlots} from '../lib/consult.mjs';
+test('a product availability question does not establish a customer requirement',()=>{assert.equal(fallbackSlots(blankSlots,'맞춤 개발도 가능한가요?').needType,'');assert.equal(fallbackSlots(blankSlots,'GPU 제품이 무엇인가요?').goal,'');assert.equal(fallbackSlots(blankSlots,'맞춤 개발·시스템 연동').needType,'맞춤 개발·시스템 연동');});
+
+import {monthsLater} from '../lib/company.mjs';
+test('follow-up dates use three calendar months and clamp month end',()=>{assert.equal(monthsLater('2026-10-30T00:30:00Z'),'2027-01-30T00:30:00.000Z');assert.equal(monthsLater('2026-11-30T00:30:00Z'),'2027-02-28T00:30:00.000Z');});
+
+import {followupAllowed,verifyChange} from '../lib/nurture-rules.mjs';
+test('follow-up rejects missing, withdrawn, future and expired consent',()=>{const now=Date.parse('2027-01-30T00:00:00Z');assert.equal(followupAllowed({},now),false);assert.equal(followupAllowed({nurture_consent_at:'2026-10-30T00:00:00Z'},now),true);assert.equal(followupAllowed({nurture_consent_at:'2026-10-30T00:00:00Z',nurture_withdrawn_at:'2027-01-01T00:00:00Z'},now),false);assert.equal(followupAllowed({nurture_consent_at:'2025-10-30T00:00:00Z'},now),false);assert.equal(followupAllowed({nurture_consent_at:'2028-10-30T00:00:00Z'},now),false);});
+test('recontact candidates require an exact NEW public excerpt',()=>{const old=[{text:'Our existing GPU infrastructure service is available.'}];const sources=[{url:'https://example.com/news',text:'Our existing GPU infrastructure service is available. New hospital research center opens this month.'}];const raw={relation:'relevant_change',source:0,quote:'Our existing GPU infrastructure service is available.',reason:'관련 가능성',uncertainty:'담당자 확인 필요'};assert.equal(verifyChange(raw,old,sources).relation,'uncertain');raw.quote='New hospital research center opens this month.';assert.equal(verifyChange(raw,old,sources).relation,'relevant_change');raw.quote='We approved a huge budget.';assert.equal(verifyChange(raw,old,sources).relation,'uncertain');});
+
+import {verifyBrief} from '../lib/brief.mjs';
+test('meeting brief retains only customer-supported summaries and numeric claims',()=>{const b=verifyBrief({issues:[{summary:'문서 검색이 느림',evidence:'문서 검색이 느려요'},{summary:'비용 90% 절감 필요',evidence:'문서 검색이 느려요'},{summary:'GPU 100개',evidence:'없는 발언'}],requirements:[],openQuestions:['문서 형태는 무엇인가요?'],preparation:[]},'문서 검색이 느려요');assert.equal(b.issues.length,1);assert.equal(b.openQuestions.length,1);});

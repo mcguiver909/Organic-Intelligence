@@ -1,0 +1,5 @@
+import {timingSafeEqual} from 'node:crypto';
+import {admin,fail} from '../../../../lib/server';
+import {reviewLead} from '../../../../lib/nurture';
+export const maxDuration=60;
+export async function GET(req){try{const secret=process.env.CRON_SECRET;if(!secret||secret.length<32)return Response.json({error:'후속 검토 스케줄러가 설정되지 않았습니다.'},{status:503});const token=req.headers.get('authorization')||'',expected='Bearer '+secret;if(token.length!==expected.length||!timingSafeEqual(Buffer.from(token),Buffer.from(expected)))throw Error('UNAUTHORIZED');const db=admin();const {data,error}=await db.from('leads').select('*').not('nurture_consent_at','is',null).is('nurture_withdrawn_at',null).gte('nurture_consent_at',new Date(Date.now()-183*86400000).toISOString()).lte('nurture_due_at',new Date().toISOString()).eq('nurture_status','재확인 예정').order('nurture_due_at').limit(1);if(error)throw error;if(!data.length)return Response.json({reviewed:0});const result=await reviewLead(db,data[0]);return Response.json({reviewed:1,status:result.status});}catch(e){return fail(e);}}

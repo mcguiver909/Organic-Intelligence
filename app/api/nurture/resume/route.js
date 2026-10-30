@@ -1,0 +1,3 @@
+import {resumeAccess} from '../../../../lib/resume';
+import {fail} from '../../../../lib/server';
+export async function POST(req){try{const {db,review}=await resumeAccess(req);const {data,error}=await db.from('leads').select('company,slots,summary,hold_reason,hold_evidence,nurture_consent_at,nurture_withdrawn_at').eq('id',review.lead_id).single();if(error||!data||Date.now()-Date.parse(data.nurture_consent_at)>183*86400000)throw Error('FORBIDDEN');return Response.json({...data,comparison:review.comparison},{headers:{'Cache-Control':'no-store','Referrer-Policy':'no-referrer'}});}catch(e){return fail(e);}}
