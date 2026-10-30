@@ -1,0 +1,49 @@
+/* ACRYL logo palette: blue wordmark + teal→mint→lime triangle */
+:root{--brand:#2457b1;--brand-dark:#1a438f;--brand-tint:#eaf0fa;--brand-teal:#63bdc5;--brand-mint:#79dfcc;--brand-lime:#ccfda4;--brand-ink:#14234a;--brand-gradient:linear-gradient(90deg,#2457b1,#63bdc5 55%,#ccfda4)}
+
+.brand-logo{display:flex;align-items:center}
+.brand-logo img{height:36px;width:auto;display:block}
+header{border-bottom:1px solid #e3e9f4}
+
+.eyebrow{color:var(--brand)}
+.journey .current{color:var(--brand)}
+.journey .current::after{content:"";display:block;height:2px;margin-top:6px;background:var(--brand-gradient);border-radius:2px}
+.hero em{color:var(--brand)}
+a:hover{color:var(--brand)}
+
+button:hover{border-color:var(--brand);color:var(--brand)}
+.primary,.composer button,.primary.cta{background:var(--brand);color:#fff;border-color:var(--brand)}
+.primary:hover,.composer button:hover,.primary.cta:hover{background:var(--brand-dark);border-color:var(--brand-dark);color:#fff}
+.secondary{background:var(--brand-tint);color:var(--brand)}
+.track-choice button.active,.need-choice button.active,.hypothesis-actions .active{background:var(--brand);color:#fff;border-color:var(--brand)}
+.question-suggestions button:hover{background:var(--brand);color:#fff;border-color:var(--brand)}
+input:focus,select:focus,textarea:focus{outline-color:var(--brand)}
+.focused-main input:focus,.focused-main textarea:focus{outline:2px solid var(--brand)}
+
+.messages .message.user,.focused-chat .conversation .message.user{background:var(--brand);color:#fff}
+.focused-chat .conversation .message.assistant{background:var(--brand-tint);color:var(--brand-ink)}
+.focused-chat .conversation .message.assistant small{color:var(--brand)}
+.hypothesis-grid blockquote,.company-discovery blockquote{border-left-color:var(--brand-teal);background:#f3f8fb}
+.notice{background:var(--brand-ink)}
+.meeting-banner{background:var(--brand-ink)}
+.meeting-banner .primary{background:#fff;color:var(--brand)}
+.company-context{border-right-color:#e3e9f4}
+
+/* AI panel in the brand's deep blue */
+.ai-panel{background:var(--brand-ink)}
+.ai-head{border-bottom-color:#2a3a63}
+.ai-block{border-bottom-color:#22325a}
+.ai-dot.live{background:var(--brand-mint)}
+.ai-bar i{background:var(--brand-gradient)}
+.ai-progress i{background:linear-gradient(90deg,var(--brand-teal),var(--brand-lime))}
+.ai-bar,.ai-progress,.ai-journey li{background:#1f2f57}
+.ai-journey li.on{background:#2f4a86}
+.ai-journey li[aria-current="step"]{background:var(--brand-mint);color:var(--brand-ink)}
+.ai-steps li.run span{border-color:var(--brand-mint);border-right-color:transparent}
+.ai-steps li.done span{background:var(--brand-mint);border-color:var(--brand-mint)}
+.ai-steps li.done span::after{border-color:var(--brand-ink)}
+.ai-slots div{background:#1a2950;border-color:#2a3a63}
+.ai-slots div.new{border-color:var(--brand-mint)}
+.ai-slots dt em{background:var(--brand-lime);color:var(--brand-ink)}
+.ai-engine{border-color:#3a4c7a}
+.thinking span{background:var(--brand)}
