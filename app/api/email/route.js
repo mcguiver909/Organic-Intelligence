@@ -19,7 +19,7 @@ export async function POST(req){try{
  try{
   const {data:booking,error:bookingError}=await db.from('meeting_bookings').select('start_at').eq('lead_id',id).maybeSingle();if(bookingError)throw bookingError;
   const pdf=await makePdf({...lead,confirmed_start:booking?.start_at});
-  const provider=await sendMail({to:lead.email,subject:'[ACRYL ONE 해커톤 데모] AI 도입 진단 미팅 준비서',text:'상담 내용에 따른 도입 검토 안내서를 첨부합니다. 자동 생성된 해커톤 데모 자료이며 공식 견적이나 성능 보증이 아닙니다. 가격과 적용 가능 범위는 ACRYL 담당자 확인이 필요합니다.',attachments:[{filename:'ACRYL-ONE-proposal.pdf',content:Buffer.from(pdf).toString('base64')}],idempotencyKey:`proposal-${id}`});
+  const provider=await sendMail({to:lead.email,subject:'[ACRYL ONE] AI 도입 진단 미팅 준비서',text:'상담 내용을 정리한 AI 도입 진단 미팅 준비서를 첨부합니다. 미팅에서 함께 확인할 사항과 준비 자료를 확인해 주세요. 가격과 적용 가능 범위는 담당자 확인 후 확정됩니다.',attachments:[{filename:'ACRYL-ONE-proposal.pdf',content:Buffer.from(pdf).toString('base64')}],idempotencyKey:`proposal-${id}`});
   const update=await db.from('email_jobs').update({status:'accepted',provider_id:provider.id}).eq('id',job.id);if(update.error)throw update.error;
   return Response.json({status:'accepted',message:'메일 서비스가 접수했습니다. 실제 수신·전달 완료는 확인되지 않았습니다.'});
  }catch(e){await db.from('email_jobs').update({status:'needs_review'}).eq('id',job.id);return Response.json({error:mailError(e)+' 자동 재발송하지 않습니다.'},{status:502});}
