@@ -26,3 +26,10 @@ test('rule insight scores products from customer words',()=>{
  assert.equal(r.intent.stage,'도입 검토');
  assert.equal(completeness({...blankSlots}),0);
 });
+
+import {productLineup,productAnswer,productQuestion} from '../lib/products.mjs';
+test('lineup matches the official contact form and answers offline',()=>{
+ assert.deepEqual(productLineup.map(p=>p.id),['JONATHAN','GPUBASE','AGENTBASE','MODELBASE','ALLM.H','NADIA-ANE','솔루션','기타']);
+ assert.ok(productAnswer(productQuestion('NADIA-ANE')).includes('EMR'));
+ assert.equal(productAnswer('아무 질문'),'');
+});
