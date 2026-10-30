@@ -5,7 +5,7 @@ import {makePdf} from '../../../lib/pdf';
 export const runtime='nodejs';
 export async function POST(req){try{
  const input=await jsonBody(req);
- if(!process.env.NEXT_PUBLIC_SUPABASE_URL&&input.demo){const demo=leadSchema.parse(input.demo);return new Response(new Uint8Array(await makePdf({...demo,id:demo.requestId,created_at:new Date().toISOString()})),{headers:{'Content-Type':'application/pdf','Cache-Control':'no-store'}});}
+ if(!(process.env.NEXT_PUBLIC_SUPABASE_URL&&process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)&&input.demo){const demo=leadSchema.parse(input.demo);return new Response(new Uint8Array(await makePdf({...demo,id:demo.requestId,created_at:new Date().toISOString()})),{headers:{'Content-Type':'application/pdf','Cache-Control':'no-store'}});}
  const body=z.object({id:z.uuid(),receipt:z.string().length(64).optional()}).parse(input);let db;
  if(body.receipt)db=admin();else ({db}=await identity(req,true));
  let q=db.from('leads').select('*').eq('id',body.id);

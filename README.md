@@ -8,7 +8,7 @@
 |---|---|---|
 | `/campaign` 문제 중심 제품 소개·공식 영상 연결 | 완료 | 공개 채널의 제목·길이·URL 확인 |
 | `/` 선택형 + 자유문장 상담 | 완료 | 키 없으면 규칙 기반 체험을 명시 |
-| 서버 Gemini 구조화 추출 | 완료 | 실제 API 키로 호출 검증 필요 |
+| Gemini 대화 + 구조화 추출 | 구현 | Flash 실제 응답 확인. 익명 로그인 활성화 후 통합 확인 |
 | 공식 제품 근거와 후보 추천 | 완료 | 2026-10-30 브라우저 확인한 3개 제품 |
 | CRM 저장·UTM 기록 | 완료 | Supabase 프로젝트 설정 필요 |
 | `/dashboard` 로그인·팀원 권한·실시간 조회 | 완료 | 실제 Supabase Auth/Realtime 검증 필요 |
@@ -52,7 +52,7 @@ values ('팀원의-실제-auth-user-uuid');
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | 브라우저 | Publishable 키(또는 legacy anon). 데이터 보호는 RLS 담당 |
 | `SUPABASE_SERVICE_ROLE_KEY` | 서버만 | Secret 키(또는 legacy service_role). 검증된 요청의 CRM 저장·권한 제어 |
 | `GEMINI_API_KEY` | 서버만 | Google Gemini 호출 |
-| `GEMINI_MODEL` | 서버만 | 기본 `gemini-3.8-flash`. 계정에서 사용 가능한 모델 확인 |
+| `GEMINI_MODEL` | 서버만 | 기본 `gemini-3.6-flash`. 계정에서 사용 가능한 모델 확인 |
 | `RESEND_API_KEY` | 서버만 | 선택적 이메일 발송 |
 | `EMAIL_FROM` | 서버만 | 본인 소유 인증 도메인의 발신주소. acryl.ai 주소를 임의 사용하지 않음 |
 
@@ -164,3 +164,18 @@ LinkedIn·Facebook·YouTube 역할 분담과 데이터셋 분석은 앱 폴더 �
 ## 디자인
 
 화이트 배경, 검정 타이포그래피·주요 버튼, 회색 구분선·보조 영역으로 정리했습니다. 기존 ACRYL 사이트의 큰 제목과 간결한 메뉴를 참고했으며 공식 영상의 색상은 유지합니다.
+
+
+## 회사 URL 선행 분석과 단계별 상담
+
+화면은 회사 URL/가설 확인 → 실제 Gemini 채팅 → 브리프/공식 영상 → 선택 접수·미팅으로 나뉩니다. 질문 버튼은 예시 답변을 재생하지 않고 현재 대화와 함께 Gemini에 전송합니다. 최근 6개 메시지와 슬롯을 전달하며 공식 제품 카탈로그 밖의 기능·성과를 약속하지 않도록 제한합니다. 문장 단위 응답이며 토큰 스트리밍·음성 Live API는 구현하지 않았습니다.
+
+`/api/company`는 HTTPS 공개 홈페이지와 같은 출처의 관련 페이지를 최대 3개 읽습니다. JS로만 렌더링되는 본문, 외부 채용 사이트, 차단 페이지는 누락될 수 있습니다. IP 리터럴·내부망·인증 URL·비표준 포트를 차단하고 모든 DNS 응답이 공개 주소인지 확인한 뒤 연결 주소를 고정합니다. 리디렉션도 재검증하며 페이지 크기·시간·이동 횟수를 제한합니다.
+
+Gemini는 본문에서 정확히 복사한 근거 문장으로 질문 후보를 선택하며, 카드 수를 억지로 채우지 않습니다. 규모·디지털 수준·실제 고충은 확정하지 않습니다. 라이브러리는 수동 작성이며 CRM 학습 결과가 아닙니다. 맞다/아니다/수정 응답은 `company_analysis`에 저장하고 PDF와 팀 브리핑에 포함합니다. 수정 응답은 고객이 쓴 설명으로 처리합니다. 거절된 가설은 추천 근거에서 제외합니다. 자동 재학습·유사 고객 성과 매칭은 구현하지 않았습니다.
+
+기존 DB는 `supabase/migration-company.sql`만 추가 실행하세요. 새 프로젝트는 `schema.sql`을 한 번 실행합니다. Auth → Sign In / Providers → Anonymous Sign-Ins를 활성화해야 로그인 없는 방문자의 API 요청이 가능합니다. 팀 DB 조회는 `team_members`로 제한합니다.
+
+로컬 `.env.local` 변경은 배포 환경에 전달되지 않습니다. Vercel → Project Settings → Environment Variables에 Supabase URL, Publishable key(ANON_KEY 이름), Secret key(SERVICE_ROLE_KEY 이름), Gemini 키, `GEMINI_MODEL=gemini-3.6-flash`를 설정하고 재배포하세요. 비밀 키에 NEXT_PUBLIC 접두사를 붙이지 않습니다. `/api/status`는 설정 존재 여부이며 서비스 성공 보장은 아닙니다.
+
+검증: 12개 테스트·Next 빌드 통과. ACRYL 홈페이지와 하위 2개 페이지 수집 확인. Gemini 3.8은 503 혼잡 응답, 3.6 Flash는 200 확인하여 기본 모델 변경. Supabase 키 인증·leads 접근 확인. 방문자 통합 흐름은 익명 로그인 활성화 후 검증 필요. 기업 실제 DB·캘린더 연결은 별도 권한/API가 필요합니다.

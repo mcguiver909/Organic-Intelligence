@@ -10,7 +10,7 @@ create table public.leads(
  id uuid primary key, owner_id uuid not null references auth.users(id),
  created_at timestamptz not null default now(),
  name text not null,company text not null,email text not null,
- slots jsonb not null,summary text not null,crm jsonb not null,
+ company_analysis jsonb,slots jsonb not null,summary text not null,crm jsonb not null,
  meeting boolean not null default false,preferred_times jsonb not null default '[]',email_consent boolean not null default false,
  consent_at timestamptz not null,consent_version text not null,
  receipt_hash text not null,utm jsonb not null default '{}',
@@ -22,7 +22,7 @@ create policy staff_read on public.leads for select to authenticated using(exist
 create policy staff_update on public.leads for update to authenticated using(exists(select 1 from public.team_members where user_id=auth.uid())) with check(exists(select 1 from public.team_members where user_id=auth.uid()));
 revoke all on public.leads from anon,authenticated;
 -- Receipt hashes and owner identifiers are never exposed to browser clients.
-grant select(id,created_at,name,company,email,slots,summary,crm,meeting,preferred_times,email_consent,consent_at,consent_version,utm,status,assignee,team_note) on public.leads to authenticated;
+grant select(id,created_at,name,company,email,company_analysis,slots,summary,crm,meeting,preferred_times,email_consent,consent_at,consent_version,utm,status,assignee,team_note) on public.leads to authenticated;
 grant update(status,assignee,team_note) on public.leads to authenticated;
 create index leads_created_at_idx on public.leads(created_at desc);
 
