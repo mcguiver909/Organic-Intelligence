@@ -5,9 +5,9 @@ ACRYL ONE AI+X Hackathon 독립 데모. 고객은 로그인 없이 회사 URL과
 ## 구현한 흐름
 
 1. 회사 URL → 공개 홈페이지와 같은 출처의 관련 페이지 최대 3개 확인. 공개 문장을 정확히 인용한 질문 가설만 제안합니다.
-2. 맞다 / 아니다 / 조금 달라요 → 좌측 회사 정보, 우측 실제 Gemini 채팅. 선택형 질문도 Gemini에 전송하며 최근 대화 6개와 확인한 조건을 이어받습니다.
+2. 맞다 / 아니다 / 조금 달라요 → 좌측 회사 정보, 우측 실제 Gemini 채팅. 선택형 질문도 Gemini에 전송하며 최근 대화 6개, 공개 사업 근거, 고객이 수정한 회사 프로필, 가설 응답과 확인한 조건을 이어받습니다. 좌측 회사명·사업 분야·주요 서비스·규모를 직접 수정하면 다음 메시지부터 반영됩니다.
 3. 실제 Gemini가 고객 발언 근거로 상담·미팅 준비 브리프를 작성합니다. 회사명·일시·현황·도입 조건·공식 제품 자료·미팅 질문·준비 자료·일정 상태를 별도 PDF로 생성합니다. 연락처 없이 미리 받을 수 있습니다.
-4. 선택 접수 → 이름·소속·이메일·상담 동의. 30분 미팅은 원하는 경우에만 희망 일정 2개까지 접수하고 팀원이 확인합니다.
+4. 선택 접수 → 생성한 브리프가 자동 포함되며 요약을 다시 작성하지 않습니다. 추가 전달사항은 선택입니다. 이름·소속·이메일·상담 동의를 받습니다. 30분 미팅은 원하는 경우에만 희망 일정 2개까지 접수하고 팀원이 확인합니다.
 5. 담당자 대시보드 → 권한 확인 후 상담 요약·가설 응답·내부 CRM 매핑·상태·담당자·메모·미팅·메일 검토.
 6. ‘내가 찾아가자’ → 별도 동의한 고객의 보류 사유와 원문, 3개월 재확인 예정일 저장. 이전 본문과 새 공개 정보를 비교해 재접촉 후보·근거·불확실성·메일 초안을 생성합니다. 담당자가 승인해야 발송하며 이전 상담 재개·수신 거부 링크를 제공합니다.
 
@@ -40,7 +40,7 @@ pnpm build
 | CRON_SECRET | 무작위 32자 이상. 서버 스케줄러 인증 |
 | RESEND_API_KEY / EMAIL_FROM | 실제 메일 발송 시 필요. 인증된 발신주소 사용 |
 
-Supabase 새 프로젝트에서는 `supabase/schema.sql`을 한 번 실행합니다. 이미 초기 스키마가 있으면 추가 기능에 맞춰 `migration-company.sql`, `migration-nurture.sql`, `migration-brief.sql`을 적용합니다. 이미 적용한 정책·발행 테이블 추가를 중복 실행하지 마세요. Auth → Sign In / Providers에서 Anonymous Sign-Ins를 켜야 고객에게 로그인 폼 없이 방문자 세션을 발급할 수 있습니다.
+Supabase 새 프로젝트에서는 `supabase/schema.sql`을 한 번 실행합니다. 이미 초기 스키마가 있으면 추가 기능에 맞춰 `migration-company.sql`, `migration-nurture.sql`, `migration-brief.sql`, `migration-profile.sql`을 적용합니다. 이미 적용한 정책·발행 테이블 추가를 중복 실행하지 마세요. Auth → Sign In / Providers에서 Anonymous Sign-Ins를 켜야 고객에게 로그인 폼 없이 방문자 세션을 발급할 수 있습니다.
 
 담당자는 Auth 사용자로 생성한 뒤 `team_members`에 해당 사용자 UUID를 등록합니다. 고객의 익명 세션은 다른 상담을 조회할 수 없습니다. 팀원도 접수 토큰 해시·상담 재개 토큰 해시와 비밀 키를 읽을 수 없습니다. 고객 이메일/동의 등 원본을 브라우저에서 임의 수정할 수 없고, 팀원은 상태·담당자·메모만 수정합니다.
 
@@ -68,3 +68,5 @@ Vercel에서 이 저장소를 Next.js 프로젝트로 연결하고 위 변수를
 GitHub Collaborators에 팀원을 추가하고 각자 브랜치 → PR → main 병합 순서로 작업하세요. 각 개발자는 별도 `.env.local`을 설정합니다. GitHub 코드 접근과 담당자 대시보드 접근은 별도 권한입니다. 개인 Plus 계정끼리 Sites 공동 편집으로 옮기는 대신 이 저장소를 공유할 수 있습니다.
 
 공식 근거: [ACRYL 문의](https://www.acryl.ai/contact), [JONATHAN](https://www.acryl.ai/products/jonathan), [GPUBASE](https://www.acryl.ai/products/gpubase), [AGENTBASE](https://www.acryl.ai/products/agentbase), [MODELBASE](https://www.acryl.ai/products/modelbase), [Gemini 구조화 출력](https://ai.google.dev/gemini-api/docs/structured-output).
+
+시연 서버에는 Gemini·Supabase·스케줄러 보안 키를 등록했습니다. 실제 담당자 시연 계정은 비공개 로컬 안내 파일로 제공하며 저장소에 포함하지 않습니다. 후속 이메일 발송은 Resend 키와 인증된 발신주소를 추가해야 합니다.
